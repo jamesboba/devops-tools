@@ -1,0 +1,83 @@
+---
+# Source: mimir-distributed/charts/minio/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-enterprise-k8s-1.25-values-minio
+  namespace: "citestns"
+  labels:
+    app: minio
+    chart: minio-5.0.7
+    release: test-enterprise-k8s-1.25-values
+    heritage: Helm
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+      release: test-enterprise-k8s-1.25-values
+  template:
+    metadata:
+      name: test-enterprise-k8s-1.25-values-minio
+      labels:
+        app: minio
+        release: test-enterprise-k8s-1.25-values
+      annotations:
+        checksum/secrets: 20215618f7cabbd5ae6ff0f1106c4f6223f2e64193e058e2dcede4443257e9a5
+        checksum/config: 76e34c0ba151a5b549aee87e26d9d0008d841073135af5721058650d865cde4d
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+
+      serviceAccountName: minio-sa
+      containers:
+        - name: minio
+          image: "quay.io/minio/minio:RELEASE.2023-02-10T18-48-39Z"
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/bin/sh"
+            - "-ce"
+            - "/usr/bin/docker-entrypoint.sh minio server /export -S /etc/minio/certs/ --address :9000 --console-address :9001"
+          volumeMounts:
+            - name: minio-user
+              mountPath: "/tmp/credentials"
+              readOnly: true
+            - name: export
+              mountPath: /export            
+          ports:
+            - name: http
+              containerPort: 9000
+            - name: http-console
+              containerPort: 9001
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: test-enterprise-k8s-1.25-values-minio
+                  key: rootUser
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: test-enterprise-k8s-1.25-values-minio
+                  key: rootPassword
+            - name: MINIO_PROMETHEUS_AUTH_TYPE
+              value: "public"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi      
+      volumes:
+        - name: export
+          persistentVolumeClaim:
+            claimName: test-enterprise-k8s-1.25-values-minio
+        - name: minio-user
+          secret:
+            secretName: test-enterprise-k8s-1.25-values-minio

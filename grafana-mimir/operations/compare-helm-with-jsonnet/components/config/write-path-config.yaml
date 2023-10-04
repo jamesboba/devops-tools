@@ -1,0 +1,21 @@
+kind: MimirConfig
+apiVersion: grafana.com/v1alpha1
+metadata:
+  name: not-important
+config:
+  ingester:
+    ring:
+      instance_availability_zone:
+      num_tokens:
+      heartbeat_timeout:
+      unregister_on_shutdown:
+  distributor:
+    ha_tracker:
+      kvstore:
+        store:
+      enable_ha_tracker:
+  limits:
+    max_global_metadata_per_user:
+    max_global_metadata_per_metric:
+    ruler_max_rule_groups_per_tenant:
+    accept_ha_samples:

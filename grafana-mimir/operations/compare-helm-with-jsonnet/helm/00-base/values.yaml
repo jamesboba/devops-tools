@@ -1,0 +1,27 @@
+chunks-cache:
+    enabled: true
+index-cache:
+    enabled: true
+metadata-cache:
+    enabled: true
+results-cache:
+    enabled: true
+minio:
+    enabled: false
+nginx:
+    enabled: false
+rbac:
+    create: false
+    pspEnabled: false
+serviceAccount:
+    create: false
+
+# To be updated in https://github.com/grafana/mimir/issues/2922
+rollout_operator:
+  enabled: false
+ingester:
+  zoneAwareReplication:
+    enabled: false
+store_gateway:
+  zoneAwareReplication:
+    enabled: false
