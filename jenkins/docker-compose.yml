@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  jenkins:
+    image: jenkins/jenkins:2.401.3-lts-jdk17 
+    #privileged: true
+    #user: ""
+    ports:
+      - 8080:8080
+      - 50000:50000
+    container_name: jenkins-lts
+    volumes:
+      - ./data/jenkins:/var/jenkins_home

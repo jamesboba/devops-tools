@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7.2.1-alpine3.18
+    container_name: redis
+    #network_mode: host
+    #user: ""
+    ports:
+     - 6379:6379
+    environment:
+      - TZ=Asia/Taipei
+    volumes:
+      - ./data/redis:/data
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+  #mysql:
+  #  image: mysql:8.0.34
+  #  container_name: mysql
+  #  #network_mode: host
+  #  user: ""
+  #  ports:
+  #   - 3306:3306
+  #  environment:
+  #    TZ: Asia/Taipei
+  #    MYSQL_ROOT_PASSWORD: password
+  #    MYSQL_DATABASE: grafana
+  #  volumes:
+  #    - ./data/mysql:/var/lib/mysql
+  #  ulimits:
+  #    nofile:
+  #      soft: 1048576
+  #      hard: 1048576
+  postgres:
+    image: postgres:15.4-alpine3.18
+    container_name: postgres
+    #network_mode: host
+    #user: ""
+    ports:
+     - 5432:5432
+    environment:
+      TZ: Asia/Taipei
+      POSTGRES_DB: grafana
+      POSTGRES_USER: postgres #postgres
+      POSTGRES_PASSWORD: password #1234
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+  grafana:
+    image: grafana/grafana-enterprise:10.1.2
+    container_name: grafana
+    #network_mode: "host"
+    #user: ""
+    ports:
+     - 3000:3000
+    environment:
+      - TZ=Asia/Taipei
+    volumes:
+      - ./defaults.ini/:/usr/share/grafana/conf/defaults.ini
+      - ./data/grafana:/var/lib/grafana
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    depends_on:
+      - postgres
+      - redis

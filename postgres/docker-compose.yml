@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  postgres1:
+    image: postgres:15.4-alpine3.18
+    container_name: postgres1
+    #network_mode: host
+    #user: ""
+    ports:
+     - 5432:5432
+    environment:
+      TZ: Asia/Taipei
+      POSTGRES_DB: grafana
+      POSTGRES_USER: postgres #postgres
+      POSTGRES_PASSWORD: password #1234
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - ./data/postgres1:/var/lib/postgresql/data
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+  postgres2:
+    image: postgres:15.4-alpine3.18
+    container_name: postgres2
+    #network_mode: host
+    #user: ""
+    ports:
+     - 5433:5432
+    environment:
+      TZ: Asia/Taipei
+      POSTGRES_DB: grafana
+      POSTGRES_USER: postgres #postgres
+      POSTGRES_PASSWORD: password #1234
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - ./data/postgres2:/var/lib/postgresql/data
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+  postgres3:
+    image: postgres:15.4-alpine3.18
+    container_name: postgres3
+    #network_mode: host
+    #user: ""
+    ports:
+     - 5434:5432
+    environment:
+      TZ: Asia/Taipei
+      POSTGRES_DB: grafana
+      POSTGRES_USER: postgres #postgres
+      POSTGRES_PASSWORD: password #1234
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - ./data/postgres3:/var/lib/postgresql/data
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+  pg-bouncer:
+    image: edoburu/pgbouncer:1.20.1-p0
+    volumes:
+      - ./pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+    ports:
+      - 6432:6432

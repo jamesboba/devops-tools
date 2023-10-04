@@ -1,0 +1,25 @@
+scope: your_db_name
+namespace: /db/
+name: postgres1
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: postgres1:8008
+etcd:
+  host: etcd1
+  port: 2379
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+      parameters:
+        archive_mode: 'on'
+        archive_command: 'test ! -f /var/lib/postgresql/data/RECOVERYHISTORY || cp /var/lib/postgresql/data/RECOVERYHISTORY /var/lib/postgresql/data/archive/RECOVERYHISTORY.%F'
+    pg_hba:
+    - host replication replicator 127.0.0.1/32 md5
+    - host replication replicator 0.0.0.0/0 trust
+    - host all all 0.0.0.0/0 md5
