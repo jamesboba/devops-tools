@@ -1,12 +1,22 @@
-version: '3.7'
+version: '3.8'
 services:
   jenkins:
-    image: jenkins/jenkins:2.401.3-lts-jdk17 
+    image: jenkins:v1.0
+    container_name: jenkins
     #privileged: true
     #user: ""
+    restart: on-failure
     ports:
       - 8080:8080
       - 50000:50000
-    container_name: jenkins-lts
+    environment:
+      - TZ=Asia/Taipei
+      - PLUGINS_FORCE_UPGRADE=true
+      - TRY_UPGRADE_IF_NO_MARKER=true
+      #- JAVA_OPTS=
     volumes:
       - ./data/jenkins:/var/jenkins_home
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576

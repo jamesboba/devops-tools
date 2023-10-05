@@ -1,5 +1,5 @@
 # 使用jenkinse官方的image為基底，在後續的指令客製環境與套件
-FROM jenkins/jenkins:2.414.1-lts-jdk17
+FROM jenkins/jenkins:2.414.2-lts-jdk17
 
 # 指定Jenkins帳號密碼
 ENV JENKINS_USER admin
@@ -9,8 +9,15 @@ ENV JENKINS_PASS admin
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 
 # 安裝jenkins plugins
-COPY plugins.txt /usr/share/jenkins/ref/
+COPY --chown=jenkins:jenkins plugins.txt /usr/share/jenkins/ref/
 RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
+
+#Passing Jenkins launcher parameters
+#COPY --chown=jenkins:jenkins certificate.pfx /var/lib/jenkins/certificate.pfx
+#COPY --chown=jenkins:jenkins https.key /var/lib/jenkins/pk
+#ENV JENKINS_OPTS --httpPort=-1 --httpsPort=8083 --httpsKeyStore=/var/lib/jenkins/certificate.pfx --httpsKeyStorePassword=Password12
+#ENV JENKINS_SLAVE_AGENT_PORT 50001
+#EXPOSE 8083
 
 # 設置運行映像時使用root使用者
 USER root

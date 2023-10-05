@@ -59,10 +59,7 @@ mapdb-api
 subversion
 ssh-slaves
 pam-auth
-ldap
 email-ext
-blueocean
-google-oauth-plugin
 role-strategy
 gitlab-plugin
 oauth-credentials
@@ -72,7 +69,8 @@ uno-choice
 description-setter
 jobConfigHistory
 simple-theme-plugin
-google-login
+#google-login
+#google-oauth-plugin
 Office-365-Connector
 mask-passwords
 aws-credentials
