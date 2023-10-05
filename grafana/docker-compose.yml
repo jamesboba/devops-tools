@@ -4,18 +4,37 @@ services:
   redis:
     image: redis:7.2.1-alpine3.18
     container_name: redis
+    restart: unless-stopped
     #network_mode: host
     #user: ""
+    command: redis-server --requirepass password
     ports:
      - 6379:6379
     environment:
-      - TZ=Asia/Taipei
+      - TZ=${TimeZone}
     volumes:
       - ./data/redis:/data
     ulimits:
       nofile:
         soft: 1048576
         hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-p", "6379", "cluster", "info" , "-a" ,"password" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
   #mysql:
   #  image: mysql:8.0.34
   #  container_name: mysql
@@ -36,38 +55,71 @@ services:
   postgres:
     image: postgres:15.4-alpine3.18
     container_name: postgres
+    restart: unless-stopped
     #network_mode: host
     #user: ""
     ports:
      - 5432:5432
     environment:
-      TZ: Asia/Taipei
-      POSTGRES_DB: grafana
-      POSTGRES_USER: postgres #postgres
-      POSTGRES_PASSWORD: password #1234
-      PGDATA: /var/lib/postgresql/data
+      TZ: ${TimeZone}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     ulimits:
       nofile:
         soft: 1048576
         hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
   grafana:
     image: grafana/grafana-enterprise:10.1.2
     container_name: grafana
+    restart: unless-stopped
     #network_mode: "host"
     #user: ""
     ports:
      - 3000:3000
     environment:
-      - TZ=Asia/Taipei
+      - TZ=${TimeZone}
     volumes:
-      - ./defaults.ini/:/usr/share/grafana/conf/defaults.ini
+      - ./grafana.ini/:/etc/grafana/grafana.ini
       - ./data/grafana:/var/lib/grafana
     ulimits:
       nofile:
         soft: 1048576
         hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
