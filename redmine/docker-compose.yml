@@ -1,0 +1,98 @@
+version: "3.8"
+
+services:
+  redmine:
+    image: redmine:5.0.6-alpine3.18
+    container_name: redmine
+    restart: unless-stopped
+    #network_mode: host
+    #user: ""
+    ports:
+     - 8080:3000
+    environment:
+      - TZ=${TimeZone}
+      - REDMINE_DB_POSTGRES=${REDMINE_DB_POSTGRES}
+      - REDMINE_DB_PORT=${REDMINE_DB_PORT}
+      - REDMINE_DB_USERNAME=${REDMINE_DB_USERNAME}
+      - REDMINE_DB_PASSWORD=${REDMINE_DB_PASSWORD}
+      - REDMINE_DB_DATABASE=${REDMINE_DB_DATABASE}
+      - REDMINE_DB_ENCODING=${REDMINE_DB_ENCODING}
+      - REDMINE_PLUGINS_MIGRATE=true
+      - REDMINE_EMAIL=${REDMINE_EMAIL}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    volumes:
+      - ./data/redmine/plugins:/usr/src/redmine/plugins
+      - ./data/redmine/themes:/usr/src/redmine/public/themes
+      - ./data/redmine/file:/usr/src/redmine/files
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:15.4-alpine3.18
+    container_name: postgres
+    restart: unless-stopped
+    #network_mode: host
+    #user: ""
+    ports:
+     - 5432:5432
+    environment:
+      TZ: ${TimeZone}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
