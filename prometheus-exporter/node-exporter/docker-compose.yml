@@ -1,0 +1,95 @@
+version: "3.8"
+services:
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:v1.6.1
+    container_name: node_exporter
+    restart: unless-stopped
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.disable-defaults'
+      - '--collector.loadavg'
+      - '--collector.time'
+      - '--collector.cpu'
+      - '--collector.meminfo'
+      - '--collector.diskstats'
+      - '--collector.diskstats.device-exclude="^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\\d+n\\d+p)\\d+$"'
+      - '--collector.netdev'
+      - '--collector.netstat'
+      - '--collector.softnet'
+      - '--collector.filesystem'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+      - '--collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue)(fs|)$$"'
+      - '--web.disable-exporter-metrics'
+      - '--web.listen-address=:9100'
+    #network_mode: host
+    ports:
+     - "9100:9100/TCP"
+    #user: ""
+    pid: host
+    #environment:
+    #  - 
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true # must
+    #user: ""
+    #network_mode: host
+    ports:
+     - "9200:9200/TCP"
+    command:
+      - '-disable_metrics=percpu,sched,resctrl,sched,process,hugetlb,referenced_memory,cpu_topology,memory_numa,tcp,advtcp,resctrl,udp'      
+      - '-docker_only=true'
+      - '-housekeeping_interval=10s'
+      - '-port=9200'
+    #environment:
+    #  - 
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s

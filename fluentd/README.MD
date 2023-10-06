@@ -1,0 +1,1 @@
+Dokcerfile for pre-install plugin

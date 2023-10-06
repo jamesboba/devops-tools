@@ -10,10 +10,11 @@ services:
     command: redis-server --requirepass password
     ports:
      - 6379:6379
-    environment:
-      - TZ=${TimeZone}
+    #environment:
+    #  - 
     volumes:
       - ./data/redis:/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
@@ -61,13 +62,13 @@ services:
     ports:
      - 5432:5432
     environment:
-      TZ: ${TimeZone}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: ${PGDATA}
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
@@ -97,11 +98,12 @@ services:
     #user: ""
     ports:
      - 3000:3000
-    environment:
-      - TZ=${TimeZone}
+    #environment:
+    #  - 
     volumes:
       - ./grafana.ini/:/etc/grafana/grafana.ini
       - ./data/grafana:/var/lib/grafana
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576

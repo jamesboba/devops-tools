@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.47.1
+    container_name: prometheus
+    restart: unless-stopped
+    #network_mode: host
+    #user: ""
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+     - 9090:9090
+    #environment:
+    #  - 
+    volumes:
+      - ./alert.rules:/etc/prometheus/alert.rules
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s

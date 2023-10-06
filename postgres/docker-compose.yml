@@ -9,13 +9,13 @@ services:
     ports:
      - 5432:5432
     environment:
-      TZ: Asia/Taipei
       POSTGRES_DB: grafana
       POSTGRES_USER: postgres #postgres
       POSTGRES_PASSWORD: password #1234
       PGDATA: /var/lib/postgresql/data
     volumes:
       - ./data/postgres1:/var/lib/postgresql/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
@@ -28,13 +28,13 @@ services:
     ports:
      - 5433:5432
     environment:
-      TZ: Asia/Taipei
       POSTGRES_DB: grafana
       POSTGRES_USER: postgres #postgres
       POSTGRES_PASSWORD: password #1234
       PGDATA: /var/lib/postgresql/data
     volumes:
       - ./data/postgres2:/var/lib/postgresql/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
@@ -54,13 +54,14 @@ services:
       PGDATA: /var/lib/postgresql/data
     volumes:
       - ./data/postgres3:/var/lib/postgresql/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
         hard: 1048576
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin4_container
+    container_name: pgadmin4
     restart: always
     ports:
       - "5050:80"
@@ -69,9 +70,11 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     volumes:
       - ./data/pgadmin:/var/lib/pgadmin
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
   pg-bouncer:
     image: edoburu/pgbouncer:1.20.1-p0
     volumes:
       - ./pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ports:
       - 6432:6432

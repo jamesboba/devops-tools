@@ -10,7 +10,6 @@ services:
     ports:
      - 8080:3000
     environment:
-      - TZ=${TimeZone}
       - REDMINE_DB_POSTGRES=${REDMINE_DB_POSTGRES}
       - REDMINE_DB_PORT=${REDMINE_DB_PORT}
       - REDMINE_DB_USERNAME=${REDMINE_DB_USERNAME}
@@ -27,6 +26,7 @@ services:
       - ./data/redmine/plugins:/usr/src/redmine/plugins
       - ./data/redmine/themes:/usr/src/redmine/public/themes
       - ./data/redmine/file:/usr/src/redmine/files
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
@@ -56,13 +56,13 @@ services:
     ports:
      - 5432:5432
     environment:
-      TZ: ${TimeZone}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: ${PGDATA}
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
@@ -96,3 +96,4 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     volumes:
       - ./data/pgadmin:/var/lib/pgadmin
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro

@@ -1,0 +1,73 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+ingester:
+  lifecycler:
+    address: 127.0.0.1
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+    final_sleep: 0s
+  chunk_idle_period: 1h # 配置日志块的空闲时间为1小时。如果一个日志块在这段时间内没有收到新的日志数据，则会被刷新
+  max_transfer_retries: 0  # 配置日志块传输的最大重试次数为0，即禁用日志块传输。
+  max_chunk_age: 20m # 配置日志块的最大年龄为1小时。当一个日志块达到这个年龄时，所有的日志数据都会被刷新。
+  chunk_target_size: 2048576 # 配置日志块的目标大小为2048576字节（约为1.5MB）。如果日志块的空闲时间或最大年龄先达到，Loki会首先尝试将日志块刷新到目标大小。
+  chunk_retain_period: 30s # 配置日志块的保留时间为30秒。这个时间必须大于索引读取缓存的TTL（默认为5分钟）。
+  wal:
+    enabled: true
+    dir: /loki/wal
+
+schema_config:
+  configs:
+    - from: 2020-07-01
+      store: boltdb-shipper
+      object_store: aws
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/boltdb-shipper-active
+    cache_location: /loki/boltdb-shipper-cache
+    cache_ttl: 24h         # Can be increased for faster performance over longer query periods, uses more disk space
+    shared_store: s3
+  aws:
+    s3: s3://us-east-1
+    bucketnames: app-sa-loki-data
+
+compactor:
+  working_directory: /loki/boltdb-shipper-compactor
+  shared_store: filesystem
+
+limits_config:
+  enforce_metric_name: false  
+  reject_old_samples: true #是否拒绝旧样本
+  reject_old_samples_max_age: 168h # 168小时之前的样本被拒绝
+  ingestion_rate_mb: 64  # 配置日志数据的最大摄入速率为64MB/s。
+  ingestion_burst_size_mb: 128 #配置日志数据的最大摄入突发大小为128MB。
+  max_entries_limit_per_query: 9999 # 没有该配置添加即可，数值改为自己想要的最大查询行数
+  max_streams_matchers_per_query: 100000 # 配置每个查询的最大流匹配器数量为100000。
+
+chunk_store_config:
+  max_look_back_period: 168h #回看日志行的最大时间，适用于即时日志,为避免查询超过保留期的数据，必须小于或等于下方的时间值,另外这个时间必须是schema_config中的period的倍数，否则报错。(这里如果配置小了，grafana中看到的日志天数也就小了，建议和下面retention_period一致)
+  
+table_manager:
+  retention_deletes_enabled: true #日志保留周期开关，默认为false
+  retention_period: 168h #日志保留周期(这里应为周期表时间的倍数 大概意思是说period，默认情况下168小时一张表，日志保留时间应该是168的倍数，比如：168x4)超过168h的日志数据将被删除
+
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /loki/rules
+  rule_path: /loki/rules-temp
+  alertmanager_url: http://localhost:9093
+  ring:
+    kvstore:
+      store: inmemory
+  enable_api: true

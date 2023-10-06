@@ -10,7 +10,6 @@ services:
     ports:
      - "8086:8086/TCP"
     environment:
-      - TZ=Asia/Taipei
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=my-user
       - DOCKER_INFLUXDB_INIT_PASSWORD=my-password
@@ -22,7 +21,7 @@ services:
       - ./data:/var/lib/influxdb2
       - ./data/influxdb2:/var/lib/influxdb2
       - ./data/influxdb2-config:/etc/influxdb2
-      #- influxdb.conf:/etc/influxdb/influxdb.conf
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
@@ -59,6 +58,7 @@ services:
      # - HOST_MOUNT_PREFIX="/hostfs"
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576

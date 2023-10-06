@@ -10,13 +10,13 @@ services:
     ports:
      - "5432:5432/TCP"
     environment:
-      TZ: Asia/Taipei
       POSTGRES_DB: timescaledb
       POSTGRES_USER: postgres #postgres
       POSTGRES_PASSWORD: password #1234
       PGDATA: /var/lib/postgresql/data
     volumes:
       - ./data/timescale:/var/lib/postgresql/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 1048576
@@ -45,3 +45,4 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     volumes:
       - ./data/pgadmin:/var/lib/pgadmin
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro

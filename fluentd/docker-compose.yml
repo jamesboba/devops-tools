@@ -1,20 +1,20 @@
-version: '3.8'
+version: "3"
 services:
-  jenkins:
-    image: jenkins:v1.0
-    container_name: jenkins
+  fluentd:
+    image: fluent/fluentd:v1.16.2-debian-arm64-1.0
+    container_name: fluentd
+    restart: unless-stopped
     #privileged: true
     #user: ""
-    restart: on-failure
+    #network_mode: host
     ports:
-      - 8080:8080
-      - 50000:50000
-    environment:
-      - PLUGINS_FORCE_UPGRADE=true
-      - TRY_UPGRADE_IF_NO_MARKER=true
-      #- JAVA_OPTS=
+     - 24224:24224
+    #environment:
+    #  - 
     volumes:
-      - ./data/jenkins:/var/jenkins_home
+      - type: bind
+        source: fluent.conf
+        target: /fluentd/etc/fluent.conf
       - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
@@ -24,7 +24,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 1024M
+          memory: 500M
         reservations:
           cpus: '0.25'
           memory: 20M
@@ -32,3 +32,4 @@ services:
         condition: on-failure
         max_attempts: 3
         delay: 5s
+    

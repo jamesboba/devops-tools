@@ -1,20 +1,16 @@
-version: '3.8'
+version: "3.8"
 services:
-  jenkins:
-    image: jenkins:v1.0
-    container_name: jenkins
-    #privileged: true
-    #user: ""
-    restart: on-failure
+
+  mysqld-exporter:
+    image: quay.io/prometheus/mysqld-exporter:v0.15.0
+    container_name: mysqld-exporter
+    restart: unless-stopped
+    #network_mode: host
+    command:
+      - '-collect.info_schema.tablestats'
     ports:
-      - 8080:8080
-      - 50000:50000
-    environment:
-      - PLUGINS_FORCE_UPGRADE=true
-      - TRY_UPGRADE_IF_NO_MARKER=true
-      #- JAVA_OPTS=
+     - "9104:9104/TCP"
     volumes:
-      - ./data/jenkins:/var/jenkins_home
       - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nofile:
@@ -24,7 +20,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 1024M
+          memory: 500M
         reservations:
           cpus: '0.25'
           memory: 20M
