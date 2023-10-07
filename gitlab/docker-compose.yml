@@ -64,10 +64,13 @@ services:
         #######################################
         ####             Redis              ###
         #######################################
-        gitlab_rails['redis_host'] = "redis"
-        gitlab_rails['redis_port'] = 6379
+        gitlab_rails['redis_host'] = 'redis'
+        gitlab_rails['redis_port'] = '6379'
         gitlab_rails['redis_ssl'] = false
-        gitlab_rails['redis_password'] = password
+        gitlab_rails['redis_password'] = 'password'
+        # Redis Cache connection
+        # Replace `redis://` with `rediss://` if using SSL
+        #gitlab_rails['redis_cache_instance'] = 'redis://:<redis_cache_password>@<redis_cache_instance_url>:<redis_cache_instance_port>'
 
         #######################################
         ###      Sidekiq configuration      ###
