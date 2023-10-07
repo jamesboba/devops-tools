@@ -1,0 +1,325 @@
+version: '3'
+services:
+  gitlab:
+    image: gitlab/gitlab-ee:16.4.1-ee.0
+    container_name: gitlab
+    restart: always
+    #user: ""
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        #######################################
+        ###             Basic               ###
+        #######################################
+        external_url 'http://192.168.2.180'
+        gitlab_rails['time_zone'] = 'Asia/Taipei'
+        #gitlab_rails['gitlab_ssh_host'] = ''
+        #gitlab_rails['gitlab_shell_ssh_port'] = 2222
+        gitlab_rails['gitaly_token'] = '7hjHR2Kq6HDNV4bWWFRcjJ5YiueLoMbhLYQYS86eTnYIG3ZTuN0hBemAJuOA76pMGssoI4CAZYe3Z2WFXDNWhtgUsIsPiAWFIvTCQSTqaf5TDjr5zdD'
+        gitlab_shell['secret_token'] = 'gEjogalHNE0dJa7oju8QAtyaHJ1mX6lmUTvjzQmlFNm4RSq1WIyEaCgfDdNTL9QFC5oKTM2zGyGRWkikaKHauFfBFs3ruyOYA8z3fqRKHkvEttFXAXLSSJbIwt1ts'
+
+        ## Disable components that will not be on the GitLab application server
+        roles ['application_role']
+
+        #######################################
+        ###             Nginx               ###
+        #######################################
+        nginx['enable'] = true
+        nginx['client_max_body_size'] = '8192m'
+
+        #######################################
+        ###          Email Server           ###
+        #######################################
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = 'smtp.gmail.com'      
+        gitlab_rails['smtp_port'] = 587   
+        gitlab_rails['smtp_user_name'] = 'example@gmail.com'
+        gitlab_rails['smtp_password'] = 'password'
+        gitlab_rails['smtp_domain'] = 'smtp.gmail.com'
+        gitlab_rails['smtp_authentication'] = 'login'
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        gitlab_rails['smtp_tls'] = false
+        gitlab_rails['smtp_openssl_verify_mode'] = 'peer'
+
+        #######################################
+        ###             Email               ###
+        #######################################
+        gitlab_rails['gitlab_email_enabled'] = true
+        gitlab_rails['gitlab_email_from'] = 'GitLab@example.com'
+        gitlab_rails['gitlab_email_display_name'] = 'GitLab'
+        # gitlab_rails['gitlab_email_reply_to'] = 'GitLab@example.com'
+        # gitlab_rails['gitlab_email_subject_suffix'] = ''
+        # gitlab_rails['gitlab_email_smime_enabled'] = false
+        # gitlab_rails['gitlab_email_smime_key_file'] = '/etc/gitlab/ssl/gitlab_smime.key'
+        # gitlab_rails['gitlab_email_smime_cert_file'] = '/etc/gitlab/ssl/gitlab_smime.crt'
+        # gitlab_rails['gitlab_email_smime_ca_certs_file'] = '/etc/gitlab/ssl/gitlab_smime_cas.crt'
+
+        #######################################
+        ###            Postgres             ###
+        #######################################
+        gitlab_rails['db_adapter'] = 'postgresql'
+        gitlab_rails['db_encoding'] = 'unicode'
+        gitlab_rails['db_host'] = 'postgres' # IP/hostname of database server
+        gitlab_rails['db_password'] = 'password'
+
+        #######################################
+        ####             Redis              ###
+        #######################################
+        gitlab_rails['redis_host'] = "redis"
+        gitlab_rails['redis_port'] = 6379
+        gitlab_rails['redis_ssl'] = false
+        gitlab_rails['redis_password'] = password
+
+        #######################################
+        ###      Sidekiq configuration      ###
+        #######################################
+        sidekiq['enable'] = true
+        ## Set number of Sidekiq queue processes to the same number as available CPUs
+        sidekiq['queue_groups'] = ['*'] * 4
+     
+        ## Set number of Sidekiq threads per queue process to the recommend number of 20
+        sidekiq['max_concurrency'] = 20
+
+        #######################################
+        ###              Puma               ###
+        #######################################
+        puma['enable'] = true
+        puma['somaxconn'] = 1024 
+        puma['ha'] = false
+        puma['worker_timeout'] = 60
+        puma['worker_processes'] = 2
+        puma['min_threads'] = 4
+        puma['max_threads'] = 4
+        puma['per_worker_max_memory_mb'] = 1200 #MB
+
+        #######################################
+        ###              SSHD               ###
+        #######################################
+        # gitlab_sshd['enable'] = false
+        # gitlab_sshd['generate_host_keys'] = true
+
+        #######################################
+        ###              CI                 ###
+        #######################################
+        gitlab_ci['gitlab_ci_all_broken_builds'] = true
+        gitlab_ci['gitlab_ci_add_pusher'] = false
+
+        #######################################
+        ###        OmniAuth Settings        ###
+        #######################################
+        gitlab_rails['omniauth_enabled'] = true
+        gitlab_rails['omniauth_allow_single_sign_on'] = ['google_oauth2','cognito']
+        gitlab_rails['omniauth_sync_email_from_provider'] = ['google_oauth2','cognito']
+        gitlab_rails['omniauth_sync_profile_from_provider'] = ['google_oauth2','cognito']
+        gitlab_rails['omniauth_sync_profile_attributes'] = ['email']
+        # gitlab_rails['omniauth_auto_sign_in_with_provider'] = 'google_oauth2'
+        gitlab_rails['omniauth_block_auto_created_users'] = true
+        gitlab_rails['omniauth_auto_link_ldap_user'] = false
+        gitlab_rails['omniauth_auto_link_saml_user'] = false
+        # gitlab_rails['omniauth_auto_link_user'] = ['google_oauth2','cognito']
+        # gitlab_rails['omniauth_external_providers'] = ['google_oauth2','cognito']
+        # gitlab_rails['omniauth_allow_bypass_two_factor'] = ['google_oauth2']
+        gitlab_rails['omniauth_providers'] = [
+        {
+          "name" => "google_oauth2",
+          "app_id" => "",
+          "app_secret" => "",
+          "args" => { "access_type" => "offline", "approval_prompt" => "" }
+        },
+        {
+          name: "cognito",
+          label: "AWS Cognito", # optional label for login button, defaults to "Cognito"
+          icon: nil,   # Optional icon URL
+          app_id: "",
+          app_secret: "",
+          args: {
+            scope: "openid profile email",
+            client_options: {
+              site: "https://<your_domain>.auth.<your_region>.amazoncognito.com",
+              authorize_url: "/oauth2/authorize",
+              token_url: "/oauth2/token",
+              user_info_url: "/oauth2/userInfo"
+            },
+            user_response_structure: {
+              root_path: [],
+              id_path: ["sub"],
+              attributes: { nickname: "email", name: "email", email: "email" }
+            },
+            name: "cognito",
+            strategy_class: "OmniAuth::Strategies::OAuth2Generic"
+          }
+        }
+        ]
+        # gitlab_rails['omniauth_cas3_session_duration'] = 28800
+        # gitlab_rails['omniauth_saml_message_max_byte_size'] = 250000
+
+        #######################################
+        ###          Object Storage         ###
+        #######################################
+        # This is an example for configuring Object Storage on GCP
+        # Replace this config with your chosen Object Storage provider as desired
+        #gitlab_rails['object_store']['enabled'] = true
+        #gitlab_rails['object_store']['connection'] = {
+        #  'provider' => 'Google',
+        #  'google_project' => '<gcp-project-name>',
+        #  'google_json_key_location' => '<path-to-gcp-service-account-key>'
+        #}
+        #gitlab_rails['object_store']['objects']['artifacts']['bucket'] = "<gcp-artifacts-bucket-name>"
+        #gitlab_rails['object_store']['objects']['external_diffs']['bucket'] = "<gcp-external-diffs-bucket-name>"
+        #gitlab_rails['object_store']['objects']['lfs']['bucket'] = "<gcp-lfs-bucket-name>"
+        #gitlab_rails['object_store']['objects']['uploads']['bucket'] = "<gcp-uploads-bucket-name>"
+        #gitlab_rails['object_store']['objects']['packages']['bucket'] = "<gcp-packages-bucket-name>"
+        #gitlab_rails['object_store']['objects']['dependency_proxy']['bucket'] = "<gcp-dependency-proxy-bucket-name>"
+        #gitlab_rails['object_store']['objects']['terraform_state']['bucket'] = "<gcp-terraform-state-bucket-name>"
+        #
+        #gitlab_rails['backup_upload_connection'] = {
+        #  'provider' => 'Google',
+        #  'google_project' => '<gcp-project-name>',
+        #  'google_json_key_location' => '<path-to-gcp-service-account-key>'
+        #}
+        #gitlab_rails['backup_upload_remote_directory'] = "<gcp-backups-state-bucket-name>"
+
+
+        #######################################
+        ###            Monitor              ###
+        #######################################
+        # Set the network addresses that the exporters used for monitoring will listen on
+        node_exporter['listen_address'] = '0.0.0.0:9100'
+        puma['listen'] = '0.0.0.0'
+        sidekiq['listen_address'] = "0.0.0.0"
+        gitlab_workhorse['prometheus_listen_addr'] = '0.0.0.0:9229'
+        
+
+        # Add the monitoring node's IP address to the monitoring whitelist and allow it to
+        # scrape the NGINX metrics. Replace placeholder `monitoring.gitlab.example.com` with
+        # the address and/or subnets gathered from the monitoring node
+        #gitlab_rails['monitoring_whitelist'] = ['<MONITOR NODE IP>/32', '127.0.0.0/8']
+        #nginx['status']['options']['allow'] = ['<MONITOR NODE IP>/32', '127.0.0.0/8']
+
+        #######################################
+        ###            Disable              ###
+        #######################################
+        #gitlab_rails['auto_migrate'] = false
+        prometheus['enable'] = false
+        alertmanager['enable'] = false
+        gitlab_exporter['enable'] = false
+        gitlab_kas['enable'] = false
+    ports:
+      - '80:80'
+      - '443:443'
+      - '2222:22'
+      #- '9229:9229/TCP' #gitlab_workhorse
+
+    volumes:
+      - './data/gitlab/config:/etc/gitlab'
+      - './data/gitlab/logs:/var/log/gitlab'
+      - './data/gitlab/data:/var/opt/gitlab'
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4096M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  postgres:
+    image: postgres:15.4-alpine3.18
+    container_name: postgres
+    restart: unless-stopped
+    #network_mode: host
+    #user: ""
+    ports:
+     - 5432:5432
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+  redis:
+    image: redis:7.2.1-alpine3.18
+    container_name: redis
+    restart: unless-stopped
+    #network_mode: host
+    #user: ""
+    command: redis-server --requirepass password
+    ports:
+     - 6379:6379
+    #environment:
+    #  - 
+    volumes:
+      - ./data/redis:/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-p", "6379", "info" , "-a" ,"password" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
