@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+
+  blackbox-exporter:
+    image: quay.io/prometheus/blackbox-exporter:v0.24.0
+    container_name: blackbox-exporter
+    restart: unless-stopped
+    #network_mode: host
+    command:
+      - '--web.listen-address=:9115'
+      - '--history.limit=100'
+      - '--config.file=/config/blackbox.yml'
+    ports:
+     - "9115:9115/TCP"
+    volumes:
+      - ./blackbox.yml:/config/blackbox.yml:ro
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s

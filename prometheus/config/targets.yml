@@ -1,0 +1,14 @@
+###################################################################################
+# HERE ARE DEFINED ALL TARGETS THAT SHOULD BE MONITORED BY THE BLACKBOX EXPORTERS #
+# THE STRUCTURE OF THIS TEMPLATE IS DESCRIBED IN THE LINE BELOW                   #
+# <BLACKBOX_EXPORTER_IP_PORT>:_:<<MODULE>:_:<JOB>:_:<TARGET_URL> #
+###################################################################################
+- targets:
+
+  # Paris Blackbox exporter
+  - blackbox-exporter:9115:_:http_2xx:_:apple:_:https://google.com
+  - blackbox-exporter:9115:_:http_2xx:_:apple:_:https://prometheus.io
+
+  # Amsterdam Blackbox exporter
+  - blackbox-exporter:9115:_:http_2xx:_:meta:_:https://google.com
+  - blackbox-exporter:9115:_:http_2xx:_:meta:_:https://prometheus.io
