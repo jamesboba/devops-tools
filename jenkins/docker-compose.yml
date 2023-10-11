@@ -1,6 +1,8 @@
 version: '3.8'
 services:
   jenkins:
+    build:
+      context: .
     image: jenkins:v1.0
     container_name: jenkins
     #privileged: true

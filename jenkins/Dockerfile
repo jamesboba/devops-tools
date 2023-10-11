@@ -22,8 +22,8 @@ RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
 # 設置運行映像時使用root使用者
 USER root
 # 安裝與更新linux套件
-RUN apt-get update && \
-    apt-get -y install apt-transport-https \
+RUN apt update && \
+    apt -y install apt-transport-https \
       ca-certificates \
       curl \
       gnupg2 \
@@ -33,6 +33,6 @@ RUN apt-get update && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli && \
-    apt-get clean && rm -rf awscliv2.zip && rm -rf aws && rm -rf /var/lib/apt/lists/*
+    apt clean && rm -rf awscliv2.zip && rm -rf aws && rm -rf /var/lib/apt/lists/*
 
 USER jenkins
