@@ -1,0 +1,1 @@
+https://github.com/zabbix/zabbix-docker/blob/6.4/docker-compose_v3_alpine_pgsql_latest.yaml
