@@ -19,6 +19,7 @@ services:
       - ./data/jenkins:/var/jenkins_home
       - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
+      nproc: 65535
       nofile:
         soft: 1048576
         hard: 1048576
