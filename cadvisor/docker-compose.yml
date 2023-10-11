@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true # must
+    #user: ""
+    #network_mode: host
+    ports:
+     - "9200:9200/TCP"
+    command:
+      - '-disable_metrics=percpu,sched,resctrl,sched,process,hugetlb,referenced_memory,cpu_topology,memory_numa,tcp,advtcp,resctrl,udp'      
+      - '-docker_only=true'
+      - '-housekeeping_interval=10s'
+      - '-port=9200'
+    #environment:
+    #  - 
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s

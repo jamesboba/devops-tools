@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+
+  influxdb:
+    image: influxdb:2.7.1-alpine
+    container_name: influxdb
+    #network_mode: "host"
+    #user: ""
+    ports:
+     - "8086:8086/TCP"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=my-user
+      - DOCKER_INFLUXDB_INIT_PASSWORD=my-password
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+    volumes:
+      - ./data:/var/lib/influxdb2
+      - ./data/influxdb2:/var/lib/influxdb2
+      - ./data/influxdb2-config:/etc/influxdb2
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+
+  telegraf:
+    image: telegraf:1.28.2-alpine
+    container_name: telegraf
+    #network_mode: "host"
+    #user: ""
+    ports:
+     - "8125:8125/UDP"
+     - "8092:8092/UDP"
+     - "8094:8094/TCP"
+    environment:
+      - TZ=Asia/Taipei
+     # - HOST_ETC="/hostfs/etc"
+     # - HOST_PROC="/hostfs/proc"
+     # - HOST_SYS="/hostfs/sys"
+     # - HOST_VAR="/hostfs/var"
+     # - HOST_RUN="/hostfs/run"
+     # - HOST_MOUNT_PREFIX="/hostfs"
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576

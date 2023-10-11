@@ -11,6 +11,8 @@ pwgen -s -c -n -y -1 20
 * Redis-exporter
 * Node-exporter
 * Postgres-exporter
+* Telegraf
+* Cadvisor
 
 ## Log
 * Fluentbit
