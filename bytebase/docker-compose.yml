@@ -1,0 +1,86 @@
+version: "3.8"
+
+services:
+  bytebase:
+    image: bytebase/bytebase:2.9.1
+    container_name: bytebase
+    restart: unless-stopped
+    init: true
+    #network_mode: host
+    #user: ""
+    command: ["--data", "/var/opt/bytebase", "--port", "8080" , "--pg" , "postgresql://bytebase:${POSTGRES_PASSWORD}@postgres:5432/bytebase"]
+    #external url
+    #command: ["--data", "/var/opt/bytebase", "--port", "8080" , "--pg" , "postgresql://bytebase:${POSTGRES_PASSWORD}@postgres:5432/bytebase", "--external-url" , ""]
+    ports:
+     - 8080:8080
+    #environment:
+    #  - 
+    volumes:
+      - ./data/bytebase:/var/opt/bytebase
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+     nproc: 65535
+     nofile:
+      soft: 20000
+      hard: 40000
+    deploy:
+     resources:
+      limits:
+        cpus: '0.70'
+        memory: 1G
+      reservations:
+        cpus: '0.5'
+        memory: 512M
+    stop_grace_period: 30s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 64999
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+    healthcheck:
+      test: ["CMD-SHELL","curl --fail http://localhost:8080/healthz || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:15.4-alpine3.18
+    container_name: postgres
+    restart: unless-stopped
+    #network_mode: host
+    #user: ""
+    ports:
+     - 5432:5432
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
