@@ -1,0 +1,116 @@
+version: "3.8"
+
+services:
+  node:
+    image: public.ecr.aws/gravitational/teleport:14.0.3
+    container_name: teleport-node
+    restart: unless-stopped
+    #network_mode: host
+    #command: -c /etc/teleport/teleport.yaml
+    #environment:
+    #  - 
+    volumes:
+      - ./data/node/data:/var/lib/teleport
+      - ./config/node.yaml:/etc/teleport/teleport.yaml
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+     nproc: 65535
+     nofile:
+      soft: 20000
+      hard: 40000
+    deploy:
+     resources:
+      limits:
+        cpus: '0.70'
+        memory: 1G
+      reservations:
+        cpus: '0.5'
+        memory: 512M
+    stop_grace_period: 30s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 64999
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+    #healthcheck:
+    #  test: ["CMD-SHELL","curl --fail http://localhost:8080/healthz || exit 1"]
+    #  interval: 5s
+    #  timeout: 10s
+    #  retries: 5
+
+  auth:
+    image: public.ecr.aws/gravitational/teleport:14.0.3
+    container_name: teleport-auth
+    restart: unless-stopped
+    #network_mode: host
+    command:
+      - '--insecure'
+    #environment:
+    #  - 
+    volumes:
+      - ./data/auth/data:/var/lib/teleport
+      - ./config/auth.yaml:/etc/teleport/teleport.yaml
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+     nproc: 65535
+     nofile:
+      soft: 20000
+      hard: 40000
+    deploy:
+     resources:
+      limits:
+        cpus: '0.70'
+        memory: 1G
+      reservations:
+        cpus: '0.5'
+        memory: 512M
+    stop_grace_period: 30s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 64999
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+    #healthcheck:
+    #  test: ["CMD-SHELL","curl --fail http://localhost:8080/healthz || exit 1"]
+    #  interval: 5s
+    #  timeout: 10s
+    #  retries: 5
+
+  proxy:
+    image: public.ecr.aws/gravitational/teleport:14.0.3
+    restart: unless-stopped
+    #network_mode: host
+    #command: start -c /etc/teleport/teleport.yaml
+    ports:
+      - "5080:5080"
+      - "5023:5023"
+    #environment:
+    #  - 
+    volumes:
+      - ./data/proxy/data:/var/lib/teleport
+      - ./config/proxy.yaml:/etc/teleport/teleport.yaml
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+     nproc: 65535
+     nofile:
+      soft: 20000
+      hard: 40000
+    deploy:
+     resources:
+      limits:
+        cpus: '0.70'
+        memory: 1G
+      reservations:
+        cpus: '0.5'
+        memory: 512M
+    stop_grace_period: 30s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 64999
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+    #healthcheck:
+    #  test: ["CMD-SHELL","curl --fail http://localhost:8080/healthz || exit 1"]
+    #  interval: 5s
+    #  timeout: 10s
+    #  retries: 5

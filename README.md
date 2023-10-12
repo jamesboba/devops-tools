@@ -2,6 +2,7 @@
 
 #### Password generate
 pwgen -s -c -n -y -1 20
+pwgen -Bsv1 15
 
 ## Monitor
 
@@ -34,6 +35,9 @@ pwgen -s -c -n -y -1 20
 
 ## SQL Audit
 * Bytebase
+
+## Jump
+* Teleport
 
 ## WEB
 
