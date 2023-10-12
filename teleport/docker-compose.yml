@@ -11,7 +11,7 @@ services:
     #  - 
     volumes:
       - ./data/node/data:/var/lib/teleport
-      - ./config/node.yaml:/etc/teleport/teleport.yaml
+      - ./config/node.yaml:/etc/teleport/teleport.yaml:ro
       - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
      nproc: 65535
@@ -49,7 +49,7 @@ services:
     #  - 
     volumes:
       - ./data/auth/data:/var/lib/teleport
-      - ./config/auth.yaml:/etc/teleport/teleport.yaml
+      - ./config/auth.yaml:/etc/teleport/teleport.yaml:ro
       - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
      nproc: 65535
@@ -88,7 +88,7 @@ services:
     #  - 
     volumes:
       - ./data/proxy/data:/var/lib/teleport
-      - ./config/proxy.yaml:/etc/teleport/teleport.yaml
+      - ./config/proxy.yaml:/etc/teleport/teleport.yaml:ro
       - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
      nproc: 65535
