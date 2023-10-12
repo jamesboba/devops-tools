@@ -42,6 +42,9 @@ pwgen -Bsv1 15
 ## Container manage
 * Portainer
 
+## Adblock
+* Adguard
+
 ## WEB
 
 * Nginx

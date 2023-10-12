@@ -1,0 +1,1 @@
+https://github.com/tborychowski/self-hosted-cookbook/blob/master/apps/ad-blockers/adguard.md

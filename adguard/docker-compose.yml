@@ -1,0 +1,44 @@
+version: '3.7'
+services:
+  adguard:
+    container_name: adguard
+    image: adguard/adguardhome:v0.107.39
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "853:853/tcp"
+      - "9001:80/tcp"
+      - "9002:443/tcp"
+      - "9003:3000/tcp"
+    #  Therese 3 are required if you want to use AdGuard as a DHCP server
+    #  - "67:67/udp"
+    #  - "68:68/tcp"
+    #  - "68:68/udp"
+    volumes:
+      - ./data/adguard/conf:/opt/adguardhome/conf
+      - ./data/adguard/data:/opt/adguardhome/work
+      - ./data/adguard/certs:/opt/adguardhome/certs
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ulimits:
+     nproc: 65535
+     nofile:
+      soft: 20000
+      hard: 40000
+    deploy:
+      resources:
+        limits:
+          cpus: '0.70'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 64999
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
