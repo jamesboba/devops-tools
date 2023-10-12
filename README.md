@@ -39,6 +39,9 @@ pwgen -Bsv1 15
 ## Jump
 * Teleport
 
+## Container manage
+* Portainer
+
 ## WEB
 
 * Nginx
