@@ -1,11 +1,10 @@
 # devops-tools
 
 #### Password generate
-pwgen -s -c -n -y -1 20
-pwgen -Bsv1 15
+> pwgen -s -c -n -y -1 20
+> pwgen -Bsv1 15
 
 ## Monitor
-
 * Prometheus
 * Blackbox-exporter
 * Mysql-exporter
@@ -24,18 +23,19 @@ pwgen -Bsv1 15
 * Grafana
 
 ## Project manage
-
 * Redmine
 
 ## DB
-
 * Postgresql
+* MySQL
 * TimescaleDB
 * Influxdb
 
 ## SQL Audit & Tool
 * Bytebase
 * pgadmin
+* phpmyadmin
+
 ## Jump
 * Teleport
 
@@ -46,10 +46,8 @@ pwgen -Bsv1 15
 * Adguard
 
 ## WEB
-
 * Nginx
 
 ## CI/CD
-
 * Gitlab
 * Jenkins
