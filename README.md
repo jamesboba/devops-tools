@@ -33,9 +33,9 @@ pwgen -Bsv1 15
 * TimescaleDB
 * Influxdb
 
-## SQL Audit
+## SQL Audit & Tool
 * Bytebase
-
+* pgadmin
 ## Jump
 * Teleport
 
