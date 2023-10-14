@@ -13,10 +13,10 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - "./data/mysql:/var/lib/mysql"
-      - "./data/log:/var/log/mysql/"
-      - "./data/mysqld:/var/run/mysqld"
-      - "./mysql.cnf:/etc/mysql/mysql.conf.d/mysql.cnf"
+      - ./data/mysql:/var/lib/mysql
+      - ./data/log:/var/log/mysql/
+      - ./data/mysqld:/var/run/mysqld
+      - ./mysql.cnf:/etc/mysql/mysql.conf.d/mysql.cnf:ro
       - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
     ulimits:
       nproc: 65535
@@ -51,6 +51,6 @@ services:
     container_name: phpmyadmin
     restart: unless-stopped
     environment:
-      - PMA_ARBITRARY: 1
+      - PMA_ARBITRARY=1
     ports:
       - '8080:80'
