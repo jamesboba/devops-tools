@@ -50,5 +50,7 @@ services:
     image: phpmyadmin:5.2.1
     container_name: phpmyadmin
     restart: unless-stopped
+    environment:
+      - PMA_ARBITRARY: 1
     ports:
       - '8080:80'
