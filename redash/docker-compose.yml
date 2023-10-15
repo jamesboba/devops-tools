@@ -3,10 +3,29 @@ x-redash-service: &redash-service
   image: redash/redash:preview
   #image: redash/redash:10.1.0.b50633
   depends_on:
-    - postgres
-    - redis
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
   env_file: ./.env
   restart: always
+  ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+
 services:
   server:
     <<: *redash-service
@@ -33,6 +52,7 @@ services:
     environment:
       QUEUES: "queries"
       WORKERS_COUNT: 2
+
   redis:
     image: redis:7.2.1-alpine3.18
     container_name: redis
@@ -64,6 +84,7 @@ services:
     restart: unless-stopped
     ports:
      - 5432:5432
+    command: "postgres -c fsync=off -c full_page_writes=off -c synchronous_commit=OFF"
     environment:
       #POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}

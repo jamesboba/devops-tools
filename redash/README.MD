@@ -1,3 +1,9 @@
+#### init db
+
+docker compose run --rm server create_db
+
+
+#### env
 COOKIE_SECRET=$(pwgen -1s 32)
 
 SECRET_KEY=$(pwgen -1s 32)
