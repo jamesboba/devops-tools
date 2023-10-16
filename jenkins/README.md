@@ -21,6 +21,7 @@
 ```
 
 ```console
+docker compose build --no-cache
 
 #docker build && test
 docker build --no-cache --compress -t jenkins:v1.0 -f Dockerfile .
