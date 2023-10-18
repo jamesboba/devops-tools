@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  nexus:
+    image: sonatype/nexus3:3.61.0
+    container_name: nexus
+    restart: unless-stopped
+    environment:
+      - INSTALL4J_ADD_VM_PARAMS="-Xms2703m -Xmx2703m -XX:MaxDirectMemorySize=2703m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+    volumes:
+      - ./nexus-data:/nexus-data
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime:ro
+    ports:
+      - "8081:8081"
+    ulimits:
+     nproc: 65535
+     nofile:
+      soft: 20000
+      hard: 40000
+    deploy:
+     resources:
+      limits:
+        cpus: '0.70'
+        memory: 3G
+      reservations:
+        cpus: '0.5'
+        memory: 512M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+    stop_grace_period: 30s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 64999
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
