@@ -11,9 +11,9 @@ services:
     ports:
       - 8080:8080
       - 50000:50000
-    environment:
-      - PLUGINS_FORCE_UPGRADE=true
-      - TRY_UPGRADE_IF_NO_MARKER=true
+    #environment:
+      #- PLUGINS_FORCE_UPGRADE=true
+      #- TRY_UPGRADE_IF_NO_MARKER=true
       #- JAVA_OPTS=
     volumes:
       - ./data/jenkins:/var/jenkins_home
@@ -24,13 +24,13 @@ services:
         soft: 1048576
         hard: 1048576
     deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1024M
-        reservations:
-          cpus: '0.25'
-          memory: 20M
+      #resources:
+      #  limits:
+      #    cpus: '1'
+      #    memory: 1024M
+      #  reservations:
+      #    cpus: '0.25'
+      #    memory: 20M
       restart_policy:
         condition: on-failure
         max_attempts: 3

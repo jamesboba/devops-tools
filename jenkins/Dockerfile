@@ -1,5 +1,5 @@
 # 使用jenkinse官方的image為基底，在後續的指令客製環境與套件
-FROM jenkins/jenkins:2.414.2-lts-jdk17
+FROM jenkins/jenkins:2.414.3-lts-jdk17
 
 # 指定Jenkins帳號密碼
 ENV JENKINS_USER admin
@@ -31,8 +31,14 @@ RUN apt update && \
       software-properties-common \
       jq && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
+    curl "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-451.0.0-linux-arm.tar.gz" -o "gcloud.tar.gz" && \
+    mkdir -p /usr/local/gcloud && \
+    tar -C /usr/local/gcloud -xvf gcloud.tar.gz && \
+    /usr/local/gcloud/google-cloud-sdk/install.sh --quiet && \
     unzip awscliv2.zip && \
     ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli && \
-    apt clean && rm -rf awscliv2.zip && rm -rf aws && rm -rf /var/lib/apt/lists/*
+    apt clean && rm -rf awscliv2.zip && rm -rf aws && rm -rf /var/lib/apt/lists/* && rm -rf gcloud.tar.gz
+
+ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
 
 USER jenkins
