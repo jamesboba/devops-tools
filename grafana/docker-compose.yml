@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   redis:
-    image: redis:7.2.1-alpine3.18
+    image: redis:7.2.3-alpine3.19
     container_name: redis
     restart: unless-stopped
     #network_mode: host
@@ -19,6 +19,9 @@ services:
       nofile:
         soft: 1048576
         hard: 1048576
+    logging:
+      options:
+        max-size: "1024m"
     deploy:
       resources:
         limits:
@@ -54,7 +57,7 @@ services:
   #      soft: 1048576
   #      hard: 1048576
   postgres:
-    image: postgres:15.4-alpine3.18
+    image: postgres:16.1-alpine3.19
     container_name: postgres
     restart: unless-stopped
     #network_mode: host
@@ -73,6 +76,9 @@ services:
       nofile:
         soft: 1048576
         hard: 1048576
+    logging:
+      options:
+        max-size: "1024m"
     deploy:
       resources:
         limits:
@@ -91,7 +97,7 @@ services:
       timeout: 10s
       retries: 5
   grafana:
-    image: grafana/grafana-enterprise:10.1.2
+    image: grafana/grafana-enterprise:10.2.3
     container_name: grafana
     restart: unless-stopped
     #network_mode: "host"
@@ -108,6 +114,9 @@ services:
       nofile:
         soft: 1048576
         hard: 1048576
+    logging:
+      options:
+        max-size: "1024m"
     deploy:
       resources:
         limits:
