@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   bytebase:
-    image: bytebase/bytebase:2.10.0
+    image: bytebase/bytebase:2.12.0
     container_name: bytebase
     restart: unless-stopped
     init: true
